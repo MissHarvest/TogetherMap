@@ -37,8 +37,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    string debug;
-
     string _uid = null;
     public string UID { get { return _uid; } set { if (_uid == null) _uid = value; } }
 
@@ -87,7 +85,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Main");
         string msg = $"enter:{UID},{PlayerPrefs.GetString("Name")},{PlayerPrefs.GetInt("Character")}";
         Debug.Log($"Enter Game [{msg}]");
-        Client.SendMsg(msg);
+        Client.SendMsg(msg);        
     }
 
     public void AddUser(string ip, GameObject go)
@@ -104,15 +102,20 @@ public class GameManager : MonoBehaviour
 
     public void ChangeUserInfo(string ip, string name, int character)
     {
-        Users[ip].GetComponent<Player>().ChangeName(name);
-        Users[ip].GetComponent<Player>().ChangeCharacter(character);
-        OnChangeUserInfoEvent?.Invoke(ip, name, character);
+        if (Users.ContainsKey(ip))
+        {
+            Users[ip].GetComponent<Player>().ChangeName(name);
+            Users[ip].GetComponent<Player>().ChangeCharacter(character);
+            OnChangeUserInfoEvent?.Invoke(ip, name, character);
+        }
     }
 
     public void MoveCharacter(string ip, Vector2 dir)
     {
-        Debug.Log($"{Users.Count}");
-        Users[ip].GetComponent<TopDownCharacterController>().CallMoveEvent(dir);
+        if (Users.ContainsKey(ip))
+        {
+            Users[ip].GetComponent<TopDownCharacterController>().CallMoveEvent(dir);
+        }
     }
 
     public void ReceiveChat(string msg)
@@ -122,45 +125,28 @@ public class GameManager : MonoBehaviour
 
     public void FlipCharacter(string id, bool bLeft)
     {
-        Users[id].GetComponent<TopDownLookMouseSide>().LookLeft(bLeft);
+        if (Users.ContainsKey(id))
+        {
+            Users[id].GetComponent<TopDownLookMouseSide>().LookLeft(bLeft);
+        }
     }
 
     public void RemoveCharacter(string id)
     {
-        debug = $"User[{id}] Remove";
         if(id == UID)
         {
             //Client.CloseSocket();
-            debug += "Its me";
         }
-        else
-        {            
-            if (Users.ContainsKey(id))
-            {
-                debug += "Contains Key";
-                Destroy(Users[id]);
-                Users.Remove(id);
-                OnExitUserEvent?.Invoke(id);
-            }
-            else
-            {
-                debug += "Dont have Key";
-                foreach(var key in Users.Keys)
-                {
-                    debug += $"/{key} ";
-                }
-            }
+        else if (Users.ContainsKey(id))
+        {
+            Destroy(Users[id]);
+            Users.Remove(id);
+            OnExitUserEvent?.Invoke(id);
         }
     }
 
     private void OnApplicationQuit()
     {
         Client.Disconnect();
-    }
-
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(5, 100, 500, 20), debug);
-        // Application.wantsToQuit
     }
 }

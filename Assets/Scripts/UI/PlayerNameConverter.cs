@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
+using UnityEngine.InputSystem;
 
 public class PlayerNameConverter : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class PlayerNameConverter : MonoBehaviour
         if(_self == null)
         {
             _self = this;
+            GameManager.Instance.Player.GetComponent<PlayerInput>().enabled = false;
         }
         else
         {
@@ -42,6 +44,7 @@ public class PlayerNameConverter : MonoBehaviour
             PlayerPrefs.SetString("Name", nameInput);
             string id = GameManager.Instance.UID;
             GameManager.Instance.Client.SendMsg($"change:{id},{PlayerPrefs.GetString("Name")},{PlayerPrefs.GetInt("Character")}");
+            GameManager.Instance.Player.GetComponent<PlayerInput>().enabled = true;
             Destroy(gameObject);
         }
     }

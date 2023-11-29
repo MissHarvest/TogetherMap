@@ -170,7 +170,6 @@ public class Client
 
             case "exit":
                 id = bodyPart[0];
-                Debug.Log($"ENDMSG:{id}");
                 GameManager.Instance.RemoveCharacter(id);
                 break;
         }

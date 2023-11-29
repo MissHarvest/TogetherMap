@@ -15,6 +15,7 @@ public class CharactorSpawner : MonoBehaviour
         if(GameManager.Instance.UID == id)
         {
             GameManager.Instance.Player = playerObject.GetComponent<Player>();
+            playerObject.GetComponent<Player>().ChangeNameColor();
             Camera.main.GetComponent<CharactorFollow>().SetTarget(playerObject);
         }
 

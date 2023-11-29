@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,11 @@ public class Player : MonoBehaviour
     {
         Name = name;
         nameText.text = name;
+    }
+
+    public void ChangeNameColor()
+    {
+        nameText.color = Color.yellow;
     }
 
     public void ChangeCharacter(int character)

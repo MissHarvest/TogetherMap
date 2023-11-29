@@ -6,6 +6,9 @@ using UnityEngine.UI;
 using System.Text;
 using System;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using Unity.VisualScripting;
+using UnityEngine.UIElements;
 
 public class Chatting : MonoBehaviour
 {
@@ -24,15 +27,21 @@ public class Chatting : MonoBehaviour
     {
         _inputField.onSubmit.AddListener(SendChat);
         GameManager.Instance.OnChat += ReceiveMsg;
-        Debug.Log("Chat Start");
         GameManager.Instance.OnSetPlayer += BindingPlayer;
     }
 
     void SendChat(string msg)
     {
         if (msg != "") GameManager.Instance.Client.SendMsg($"chat:{PlayerPrefs.GetString("Name")}, {msg}\n");
-        _inputField.text = "";
+        _inputField.text = "";        
         EventSystem.current.SetSelectedGameObject(null);
+        StartCoroutine(ActivatePlayerInput());
+    }
+
+    IEnumerator ActivatePlayerInput()
+    {
+        yield return new WaitForSeconds(0.2f);
+        GameManager.Instance.Player.GetComponent<PlayerInput>().enabled = true;
     }
 
     void ReceiveMsg(string msg)
@@ -61,8 +70,10 @@ public class Chatting : MonoBehaviour
 
     void ActivateChat()
     {
-        Debug.Log($"Press Enter {_inputField.isFocused} {this.gameObject.name}");
         if (_inputField.isFocused == false)
+        {
+            GameManager.Instance.Player.GetComponent<PlayerInput>().enabled = false;
             _inputField.Select();
+        }
     }
 }
