@@ -12,6 +12,7 @@ public class ConnectedUserViewer : MonoBehaviour
     {
         GameManager.Instance.OnAddUserEvent += AddUserNameSlot;
         GameManager.Instance.OnChangeUserInfoEvent += ChangeUserName;
+        GameManager.Instance.OnExitUserEvent += RemoveUserNameSlot;
     }
 
     public void AddUserNameSlot(string ip, GameObject go)
@@ -26,5 +27,14 @@ public class ConnectedUserViewer : MonoBehaviour
     public void ChangeUserName(string ip, string name, int character)
     {
         _users[ip].SetText(name);
+    }
+
+    public void RemoveUserNameSlot(string id)
+    {
+        if (_users.ContainsKey(id))
+        {
+            Destroy(_users[id].gameObject);
+            _users.Remove(id);
+        }
     }
 }

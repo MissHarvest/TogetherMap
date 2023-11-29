@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     //public string ServerIP { get { return Client.serverIP; } }
 
     public event Action<string, GameObject> OnAddUserEvent;
+    public event Action<string> OnExitUserEvent;
     public event Action<string, string, int> OnChangeUserInfoEvent;
     public event Action<string> OnChat;
 
@@ -35,6 +36,8 @@ public class GameManager : MonoBehaviour
 
         }
     }
+
+    string debug;
 
     string _uid = null;
     public string UID { get { return _uid; } set { if (_uid == null) _uid = value; } }
@@ -120,5 +123,44 @@ public class GameManager : MonoBehaviour
     public void FlipCharacter(string id, bool bLeft)
     {
         Users[id].GetComponent<TopDownLookMouseSide>().LookLeft(bLeft);
+    }
+
+    public void RemoveCharacter(string id)
+    {
+        debug = $"User[{id}] Remove";
+        if(id == UID)
+        {
+            //Client.CloseSocket();
+            debug += "Its me";
+        }
+        else
+        {            
+            if (Users.ContainsKey(id))
+            {
+                debug += "Contains Key";
+                Destroy(Users[id]);
+                Users.Remove(id);
+                OnExitUserEvent?.Invoke(id);
+            }
+            else
+            {
+                debug += "Dont have Key";
+                foreach(var key in Users.Keys)
+                {
+                    debug += $"/{key} ";
+                }
+            }
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        Client.Disconnect();
+    }
+
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(5, 100, 500, 20), debug);
+        // Application.wantsToQuit
     }
 }

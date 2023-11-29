@@ -52,6 +52,7 @@ public class Client
         try
         {
             _clientSocket.Connect(ep);
+            //_clientSocket.Close();
             connected = true;
             Debug.Log("Client Connect to Sever[" + ep.ToString() + "]");
             return true;
@@ -162,12 +163,27 @@ public class Client
                 break;
 
             case "chat":
-                string[] t = bodyPart[1].Split('\n');
-                
+                string[] t = bodyPart[1].Split('\n');                
                 string msg = string.Format("{0} : {1}", bodyPart[0], t[0]);
                 GameManager.Instance.ReceiveChat(msg);
                 break;
-        }
 
+            case "exit":
+                id = bodyPart[0];
+                Debug.Log($"ENDMSG:{id}");
+                GameManager.Instance.RemoveCharacter(id);
+                break;
+        }
+    }
+
+    public void Disconnect()
+    {
+        SendMsg($"exit:{GameManager.Instance.UID},");
+        //_clientSocket.Disconnect(false);
+    }
+
+    public void CloseSocket()
+    {
+        _clientSocket.Close();
     }
 }
